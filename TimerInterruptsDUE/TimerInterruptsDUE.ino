@@ -1,7 +1,7 @@
 // Turns
 const int ledPin = 13;
-const int NMAX = 100;
-const int JMAX = 10;
+const int NMAX = 10000;
+const int JMAX = 100;
 const unsigned long period = 100;
 const uint32_t freq = 10;
 
@@ -12,7 +12,8 @@ unsigned long start_time;
 // channel is the compare channel (0, 1, 2)
 // irq is the interrupt request corresponding to the timer and channel
 // frequency is the rate at which you want the interrupt to fire in Hz
-void startTimer(Tc *tc, uint32_t channel, IRQn_Type irq, uint32_t frequency) {
+void startTimer(Tc *tc, uint32_t channel, IRQn_Type irq, uint32_t frequency)
+{
   pmc_set_writeprotect(false);
   pmc_enable_periph_clk((uint32_t)irq);
   TC_Configure(tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK4);
@@ -58,7 +59,7 @@ void loop()
   double Ts = 1/44100.0;
   double sum = 0;
   double sums[JMAX];
-  for (int j=0; j<JMAX; j++)
+ for (int j=0; j<JMAX; j++)
   {
     sums[j] = 0;
   
@@ -69,12 +70,13 @@ void loop()
     }
     sum += sums[j];
   }
-  unsigned int current_time = millis();
+  // unsigned int current_time = millis();
   
-  if (current_time - start_time >= period) {
+ /* if (current_time - start_time >= period) {
     digitalWrite(ledPin, l = !l);
     start_time = millis();
   }
+  */
 }
 
 //volatile boolean l;
@@ -82,9 +84,18 @@ void loop()
 // This function is called every 1/40 sec.
 void TC3_Handler()
 {
+
+ unsigned int current_time = millis();
+
+
+  
   static boolean l = false;
   // You must do TC_GetStatus to "accept" interrupt
   // As parameters use the first two parameters used in startTimer (TC1, 0 in this case)
   TC_GetStatus(TC1, 0);
 
+if (current_time - start_time >= period) {
+    digitalWrite(ledPin, l = !l);
+    start_time = millis();
+  }
 }
